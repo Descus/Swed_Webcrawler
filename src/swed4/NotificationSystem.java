@@ -1,37 +1,38 @@
 package swed4;
 
-import swed4.channels.EmailNotification;
-import swed4.channels.PushNotification;
+import swed4.channels.*;
+import swed4.website.Website;
+import swed4.website.WebsiteSubscription;
 
 import java.net.URI;
 import java.util.*;
 
-public class System {
+public class NotificationSystem {
     
-    private static System instance;
+    private static NotificationSystem instance;
     private final Map<String, Website> knownSites = new HashMap<>();
     private final Map<User, List<WebsiteSubscription>> subscriptionMap = new HashMap<>();
     private final Map<String, User> users = new HashMap<>();
     
-    public User createUser(String name, URI website, int frequency, AvailableChannels... channels){
+    public User createUser(String name, URI website, AvailableChannels... channels){
         
         User user = new User(name, getNotificationChannelList(channels));
-        createSubscription(name, website, frequency, user);
+        createSubscription(website, user);
         users.put(name, user);
         return user;
     }
 
-    public void createSubscription(String name, URI website, int frequency, User user) {
-        if(!knownSites.containsKey(website.toString())) {
+    public void createSubscription(URI website, User user) {
+        if (!knownSites.containsKey(website.toString())) {
             knownSites.put(website.toString(), new Website(website));
         }
         WebsiteSubscription newSub = new WebsiteSubscription(knownSites.get(website.toString()));
-        newSub.addSubscriber(user, frequency);
-        if(!subscriptionMap.containsKey(user)) {
+        newSub.addSubscriber(user);
+        if (!subscriptionMap.containsKey(user)) {
             List<WebsiteSubscription> subs = new ArrayList<>();
             subs.add(newSub);
             subscriptionMap.put(user, subs);
-        }else{
+        } else {
             subscriptionMap.get(user).add(newSub);
         }
     }
@@ -40,7 +41,7 @@ public class System {
         subscriptionMap.forEach((_, subscription) -> subscription.forEach(WebsiteSubscription::checkForUpdate));
     }
     
-    private static Collection<INotificationChannel> getNotificationChannelList(AvailableChannels[] channels){
+    public static Collection<INotificationChannel> getNotificationChannelList(AvailableChannels[] channels){
         List<INotificationChannel> channelList = new ArrayList<>();
         for (AvailableChannels channel : channels) {
             channelList.add(getNotificationChannel(channel));
@@ -50,14 +51,15 @@ public class System {
 
     public static INotificationChannel getNotificationChannel(AvailableChannels channel) {
         return switch (channel) {
-            case Push -> new PushNotification();
-            case Email -> new EmailNotification();
+            case Push -> new PushChannel();
+            case Email -> new EmailChannel();
+            case Webhook -> new WebhookChannel();
         };
     }
 
-    public static System getInstance(){
+    public static NotificationSystem getInstance(){
         if(instance == null){
-            instance = new System();
+            instance = new NotificationSystem();
         }
         return instance;
     }

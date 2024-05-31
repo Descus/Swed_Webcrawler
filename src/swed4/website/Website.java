@@ -1,4 +1,4 @@
-package swed4;
+package swed4.website;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,8 +27,10 @@ public class Website {
             throw new RuntimeException(e);
         }
 
-        if(!newWebsiteContent.toString().equals(websiteContent)) update = true;
-        websiteContent = newWebsiteContent.toString();
+        if(!newWebsiteContent.toString().equals(websiteContent)) {
+            update = true;
+            websiteContent = newWebsiteContent.toString();
+        }
     }
 
     public boolean hasUpdate(){

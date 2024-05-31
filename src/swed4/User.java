@@ -1,5 +1,8 @@
 package swed4;
 
+import swed4.channels.AvailableChannels;
+import swed4.channels.INotificationChannel;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,8 +16,8 @@ public class User {
         notificationChannels.addAll(channels);
     }
     
-    public void addChannel(AvailableChannels channel){
-        notificationChannels.add(System.getNotificationChannel(channel));
+    public void addChannels(AvailableChannels... channel){
+        notificationChannels.addAll(NotificationSystem.getNotificationChannelList(channel));
     }
     
     public void SendNotifications(String message){
