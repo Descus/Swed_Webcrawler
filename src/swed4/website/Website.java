@@ -1,18 +1,23 @@
 package swed4.website;
 
+import swed4.observer.Subject;
+import swed4.strategy.ComparisonStrategy;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
-public class Website {
+public class Website extends Subject {
     private final URI uri;
+    private final ComparisonStrategy comparisonStrategy;
     private String websiteContent;
     private boolean update;
 
-    public Website(URI uri){
+    public Website(URI uri, ComparisonStrategy comparisonStrategy){
         this.uri = uri;
+        this.comparisonStrategy = comparisonStrategy;
         updateWebsiteContent();
     }
 
@@ -27,21 +32,9 @@ public class Website {
             throw new RuntimeException(e);
         }
 
-        if(!newWebsiteContent.toString().equals(websiteContent)) {
-            update = true;
+        if(!comparisonStrategy.Compare(websiteContent, newWebsiteContent.toString())) {
+            Notify();
             websiteContent = newWebsiteContent.toString();
         }
-    }
-
-    public boolean hasUpdate(){
-        return update;
-    }
-    
-    public void resetUpdate(){
-        update = false;
-    }
-
-    public URI getUri() {
-        return uri;
     }
 }

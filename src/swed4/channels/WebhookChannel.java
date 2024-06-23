@@ -1,4 +1,4 @@
-﻿package swed4.channels;
+package swed4.channels;
 
 public class WebhookChannel implements INotificationChannel {
     @Override
